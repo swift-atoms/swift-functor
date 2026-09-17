@@ -8,6 +8,8 @@ let package = Package(
     products: [
         .library(name: "Functor Macro", targets: ["Functor Macro"]),
         .library(name: "Functor Macro Core", targets: ["Functor Macro Core"]),
+        .library(name: "Functor Base Macro", targets: ["Functor Base Macro"]),
+        .library(name: "Functor Base Macro Core", targets: ["Functor Base Macro Core"]),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax.git", "603.0.2"..<"604.0.0")
@@ -36,6 +38,30 @@ let package = Package(
         .testTarget(
             name: "Functor Macro Tests",
             dependencies: ["Functor Macro"]
+        ),
+        .target(
+            name: "Functor Base Macro Core",
+            dependencies: [
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+            ]
+        ),
+        .macro(
+            name: "Functor Base Macro Plugin",
+            dependencies: [
+                "Functor Base Macro Core",
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+            ]
+        ),
+        .target(
+            name: "Functor Base Macro",
+            dependencies: ["Functor Base Macro Plugin"]
+        ),
+        .testTarget(
+            name: "Functor Base Macro Tests",
+            dependencies: ["Functor Base Macro"]
         ),
     ],
     swiftLanguageModes: [.v6]
