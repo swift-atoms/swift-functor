@@ -1,4 +1,4 @@
-import Functor_Derivation
+import Functor_Macro
 import Testing
 
 @Functor

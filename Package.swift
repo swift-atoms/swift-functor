@@ -4,38 +4,38 @@ import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
-    name: "swift-functor-derivation",
+    name: "swift-functor",
     products: [
-        .library(name: "Functor Derivation", targets: ["Functor Derivation"]),
-        .library(name: "Functor Derivation Core", targets: ["Functor Derivation Core"]),
+        .library(name: "Functor Macro", targets: ["Functor Macro"]),
+        .library(name: "Functor Macro Core", targets: ["Functor Macro Core"]),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax.git", "603.0.2"..<"604.0.0")
     ],
     targets: [
         .target(
-            name: "Functor Derivation Core",
+            name: "Functor Macro Core",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ]
         ),
         .macro(
-            name: "Functor Derivation Macros",
+            name: "Functor Macro Plugin",
             dependencies: [
-                "Functor Derivation Core",
+                "Functor Macro Core",
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
             ]
         ),
         .target(
-            name: "Functor Derivation",
-            dependencies: ["Functor Derivation Macros"]
+            name: "Functor Macro",
+            dependencies: ["Functor Macro Plugin"]
         ),
         .testTarget(
-            name: "Functor Derivation Tests",
-            dependencies: ["Functor Derivation"]
+            name: "Functor Macro Tests",
+            dependencies: ["Functor Macro"]
         ),
     ],
     swiftLanguageModes: [.v6]
