@@ -9,6 +9,9 @@ public struct Macro: MemberMacro {
         conformingTo _: [TypeSyntax],
         in _: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
+        if let enumeration = declaration.as(EnumDeclSyntax.self) {
+            return Derivation.expansion(of: enumeration)
+        }
         guard let declaration = declaration.as(StructDeclSyntax.self) else {
             throw MacroExpansionErrorMessage(
                 "@Functor applies to a generic struct declaration only."
