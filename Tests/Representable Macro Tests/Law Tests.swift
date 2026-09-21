@@ -15,3 +15,23 @@ import Testing
     let _: Empty<Int> = .tabulate(Empty<Int>().index)
     #expect(EmptyIndex.count.rawValue == 0)
 }
+
+@Representable private struct Answers {
+    let first: Bool?
+    let second: Bool?
+
+    init(_ first: Bool?, answer second: Bool?) {
+        self.first = first
+        self.second = second
+    }
+}
+
+@Test func concreteRepresentationPreservesCoordinatesAndConstructionLabels() {
+    let input = Answers(nil, answer: true)
+    #expect(Array(input.values) == [nil, true])
+    #expect(input.values.contains(true))
+    #expect(!input.values.allSatisfy { $0 == false })
+    #expect(Array(Answers.tabulate(input.index).values) == Array(input.values))
+    #expect(Array(Triple(first: 2, second: 3, third: 5).values) == [2, 3, 5])
+    #expect(Empty<Int>().values.isEmpty)
+}
