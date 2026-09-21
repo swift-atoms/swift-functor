@@ -9,7 +9,7 @@ public macro Representable() = #externalMacro(module: "Representable_Macro_Plugi
 
 /// What the macro derives, as a protocol: a product read and built through its finite field index.
 /// A derived product conforms by declaring it; nothing beyond the derived members is required.
-public protocol Representable {
+public protocol Representable<Value> {
     associatedtype Index: Swift.CaseIterable & Swift.Hashable
     associatedtype Value
     func index(_ coordinate: Index) -> Value
