@@ -69,6 +69,6 @@ public enum Derivation {
         guard let structure = declaration.as(StructDeclSyntax.self) else { throw Type.Failure("@Representable requires a struct") }
         let shape = try shape(of: structure)
         let cases = shape.properties.fields.map { "case \($0.name)" }.joined(separator: "\n")
-        return [DeclSyntax(stringLiteral: "@Finite\n\(shape.access)enum \(structure.name.text)Index: Finite::Finite.Enumerable, Swift.CaseIterable { \(cases) }")]
+        return [DeclSyntax(stringLiteral: "@Finite\n\(shape.access)enum \(structure.name.text)Index: Finite::Finite.Enumerable, Swift.CaseIterable, Swift.Sendable { \(cases) }")]
     }
 }
