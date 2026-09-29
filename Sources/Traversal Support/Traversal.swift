@@ -1,5 +1,3 @@
-/// Concrete finite traversals. Arrays are visited left-to-right; failures stop further visits.
-/// Async traversal is sequential and introduces no tasks or parallel scheduling policy.
 public enum Traversal {
     public static func optional<A, B>(_ values: [A], _ transform: (A) -> B?) -> [B]? {
         var result: [B] = []
