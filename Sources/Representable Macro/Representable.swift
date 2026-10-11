@@ -4,7 +4,7 @@
 public macro Representable() = #externalMacro(module: "Representable_Macro_Plugin", type: "Derive")
 
 public protocol Representable {
-    associatedtype Index: Swift.CaseIterable & Swift.Hashable
+    associatedtype Index: Swift::CaseIterable & Swift::Hashable
     associatedtype Value
     func index(_ coordinate: Index) -> Value
     static func tabulate(_ value: (Index) -> Value) -> Self

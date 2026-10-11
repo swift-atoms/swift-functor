@@ -1,4 +1,6 @@
-public enum Traversal {
+public enum Traversal {}
+
+extension Traversal {
     public static func optional<A, B>(_ values: [A], _ transform: (A) -> B?) -> [B]? {
         var result: [B] = []
         for value in values { guard let mapped = transform(value) else { return nil }; result.append(mapped) }

@@ -1,7 +1,9 @@
 import SwiftSyntax
 import SwiftSyntaxMacros
 import Traversable_Macro_Core
-struct Derive: MemberMacro {
+struct Derive: MemberMacro {}
+
+extension Derive {
     static func expansion(of node: AttributeSyntax, providingMembersOf declaration: some DeclGroupSyntax,
         conformingTo protocols: [TypeSyntax], in context: some MacroExpansionContext) throws -> [DeclSyntax] {
         try Derivation.members(of: declaration)

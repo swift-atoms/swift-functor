@@ -1,7 +1,9 @@
 import Type_Algebra_Syntax
 public import SwiftSyntax
 import SwiftSyntaxBuilder
-public enum Derivation {
+public enum Derivation {}
+
+extension Derivation {
     private static func shape(of structure: StructDeclSyntax) throws -> (properties: Type.Syntax.Properties, element: String, access: String, labels: [String?]) {
         let properties = Type.Syntax.Properties(structure)
         guard properties.diagnostics.isEmpty else {

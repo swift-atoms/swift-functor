@@ -24,33 +24,33 @@ let package = Package(
     ],
     targets: [
         .testTarget(name: "Representable Macro Tests", dependencies: [
-            "Representable Macro",
-            "Functor Macro",
+            .target(name: "Representable Macro"),
+            .target(name: "Functor Macro"),
         ]),
         .testTarget(name: "Traversable Macro Tests", dependencies: [
-            "Traversable Macro",
-            "Functor Macro",
+            .target(name: "Traversable Macro"),
+            .target(name: "Functor Macro"),
             .product(name: "Foldable Macro", package: "swift-foldable"),
         ]),
         .testTarget(name: "Algebra Consumer Tests", dependencies: [
             .product(name: "Cardinal", package: "swift-cardinal"),
-            "Algebra Consumer Fixtures",
+            .target(name: "Algebra Consumer Fixtures"),
         ]),
         .target(name: "Algebra Consumer Fixtures", dependencies: [
-            "Functor Macro",
-            "Traversable Macro",
-            "Representable Macro",
+            .target(name: "Functor Macro"),
+            .target(name: "Traversable Macro"),
+            .target(name: "Representable Macro"),
         ]),
         .testTarget(name: "Invariant Macro Tests", dependencies: [
-            "Invariant Macro",
+            .target(name: "Invariant Macro"),
             .product(name: "Algebra Test Support", package: "swift-algebra"),
         ]),
         .target(name: "Representable Macro", dependencies: [
-            "Representable Macro Plugin",
+            .target(name: "Representable Macro Plugin"),
             .product(name: "Finite Macro", package: "swift-finite"),
         ]),
         .macro(name: "Representable Macro Plugin", dependencies: [
-            "Representable Macro Core",
+            .target(name: "Representable Macro Core"),
             .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
             .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
             .product(name: "SwiftSyntax", package: "swift-syntax"),
@@ -61,11 +61,11 @@ let package = Package(
             .product(name: "Type Algebra Syntax", package: "swift-algebra"),
         ]),
         .target(name: "Traversable Macro", dependencies: [
-            "Traversable Macro Plugin",
-            "Traversal Support",
+            .target(name: "Traversable Macro Plugin"),
+            .target(name: "Traversal Support"),
         ]),
         .macro(name: "Traversable Macro Plugin", dependencies: [
-            "Traversable Macro Core",
+            .target(name: "Traversable Macro Core"),
             .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
             .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
             .product(name: "SwiftSyntax", package: "swift-syntax"),
@@ -78,10 +78,10 @@ let package = Package(
         .target(name: "Traversal Support", dependencies: [
         ]),
         .target(name: "Invariant Macro", dependencies: [
-            "Invariant Macro Plugin",
+            .target(name: "Invariant Macro Plugin"),
         ]),
         .macro(name: "Invariant Macro Plugin", dependencies: [
-            "Invariant Macro Core",
+            .target(name: "Invariant Macro Core"),
             .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
             .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
             .product(name: "SwiftSyntax", package: "swift-syntax"),
@@ -102,7 +102,7 @@ let package = Package(
         .macro(
             name: "Functor Macro Plugin",
             dependencies: [
-                "Functor Macro Core",
+                .target(name: "Functor Macro Core"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
@@ -110,12 +110,12 @@ let package = Package(
         ),
         .target(
             name: "Functor Macro",
-            dependencies: ["Functor Macro Plugin"]
+            dependencies: [.target(name: "Functor Macro Plugin")]
         ),
         .testTarget(
             name: "Functor Macro Tests",
             dependencies: [
-            .product(name: "Algebra Test Support", package: "swift-algebra"),"Functor Macro"]
+            .product(name: "Algebra Test Support", package: "swift-algebra"),.target(name: "Functor Macro")]
         ),
         .target(
             name: "Functor Base Macro Core",
@@ -128,7 +128,7 @@ let package = Package(
         .macro(
             name: "Functor Base Macro Plugin",
             dependencies: [
-                "Functor Base Macro Core",
+                .target(name: "Functor Base Macro Core"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
@@ -137,32 +137,25 @@ let package = Package(
         .target(
             name: "Functor Base Macro",
             dependencies: [
-                "Functor Macro","Functor Base Macro Plugin"]
+                .target(name: "Functor Macro"),.target(name: "Functor Base Macro Plugin")]
         ),
         .testTarget(
             name: "Functor Base Macro Tests",
-            dependencies: ["Functor Base Macro"]
+            dependencies: [.target(name: "Functor Base Macro")]
         ),
     ],
     swiftLanguageModes: [.v6]
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    let ecosystem: [SwiftSetting] = [
+    target.swiftSettings = (target.swiftSettings ?? []) + [
         .strictMemorySafety(),
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
         .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-        .enableExperimentalFeature("Lifetimes"),
         .enableUpcomingFeature("InferIsolatedConformances"),
+        .enableExperimentalFeature("Lifetimes"),
+        .treatAllWarnings(as: .error),
     ]
-    let package: [SwiftSetting] = []
-
-    target.swiftSettings = (target.swiftSettings ?? []) + ecosystem + package
-}
-
-// Consumer compilation must reject visibility regressions, even when other packages suppress warnings.
-for target in package.targets where target.type == .test || target.name.hasSuffix("Consumer Fixtures") {
-    target.swiftSettings = (target.swiftSettings ?? []) + [.treatAllWarnings(as: .error)]
 }

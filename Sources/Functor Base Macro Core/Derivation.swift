@@ -2,7 +2,9 @@ import Type_Algebra_Syntax
 public import SwiftSyntax
 import SwiftSyntaxBuilder
 
-public enum Derivation {
+public enum Derivation {}
+
+extension Derivation {
     public static func base(of declaration: EnumDeclSyntax) -> [DeclSyntax] {
         do { try Type.Syntax.Recursion.validate(declaration) } catch {
             return [DeclSyntax(stringLiteral: "#error(\(String(reflecting: String(describing: error))))")]
