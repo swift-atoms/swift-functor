@@ -1,6 +1,7 @@
-import Cardinal
 import Algebra_Consumer_Fixtures
+import Cardinal
 import Testing
+
 @Test func derivedAPIsCrossThePublicBoundary() async throws {
     let value = Coordinates<Int>.tabulate { $0 == .x ? 2 : 3 }
     let coordinate: Coordinates<String>.Index = Coordinates<Int>.Index.x

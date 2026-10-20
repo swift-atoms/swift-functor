@@ -1,6 +1,7 @@
-import Type_Algebra_Syntax
 public import SwiftSyntax
 import SwiftSyntaxBuilder
+import Type_Algebra_Syntax
+
 public enum Derivation {}
 
 extension Derivation {
@@ -24,19 +25,22 @@ extension Derivation {
         var labels: [String?] = properties.fields.map(\.name)
         if properties.hasCustomInitializer {
             let constructors = structure.memberBlock.members.compactMap { $0.decl.as(InitializerDeclSyntax.self) }
-            guard let constructor = constructors.first(where: { initializer in
-                let parameters = Array(initializer.signature.parameterClause.parameters)
-                guard initializer.optionalMark == nil, initializer.genericParameterClause == nil,
-                      initializer.genericWhereClause == nil, initializer.signature.effectSpecifiers == nil,
-                      initializer.attributes.isEmpty, parameters.count == properties.fields.count,
-                      let body = initializer.body, body.statements.count == parameters.count else { return false }
-                return zip(zip(properties.fields, parameters), body.statements).allSatisfy { pair, statement in
-                    let (field, parameter) = pair
-                    return parameter.type.trimmedDescription == field.type.trimmedDescription
-                        && parameter.modifiers.isEmpty && parameter.attributes.isEmpty && parameter.ellipsis == nil
-                        && statement.tokens(viewMode: .sourceAccurate).map(\.text) == ["self", ".", field.name, "=", (parameter.secondName ?? parameter.firstName).text]
-                }
-            }) else {
+            guard
+                let constructor = constructors.first(where: { initializer in
+                    let parameters = Array(initializer.signature.parameterClause.parameters)
+                    guard initializer.optionalMark == nil, initializer.genericParameterClause == nil,
+                        initializer.genericWhereClause == nil, initializer.signature.effectSpecifiers == nil,
+                        initializer.attributes.isEmpty, parameters.count == properties.fields.count,
+                        let body = initializer.body, body.statements.count == parameters.count
+                    else { return false }
+                    return zip(zip(properties.fields, parameters), body.statements).allSatisfy { pair, statement in
+                        let (field, parameter) = pair
+                        return parameter.type.trimmedDescription == field.type.trimmedDescription
+                            && parameter.modifiers.isEmpty && parameter.attributes.isEmpty && parameter.ellipsis == nil
+                            && statement.tokens(viewMode: .sourceAccurate).map(\.text) == ["self", ".", field.name, "=", (parameter.secondName ?? parameter.firstName).text]
+                    }
+                })
+            else {
                 throw Type.Failure("@Representable requires a direct fieldwise initializer; validating or transforming construction needs a manual representation")
             }
             labels = constructor.signature.parameterClause.parameters.map { $0.firstName.text == "_" ? nil : $0.firstName.text }
@@ -51,21 +55,34 @@ extension Derivation {
         let fields = shape.properties.fields
         let arms = fields.map { "case .\($0.name): return self.\($0.name)" }.joined(separator: "\n")
         let arguments = zip(fields, shape.labels).map { field, label in "\(label.map { "\($0): " } ?? "")value(.\(field.name))" }.joined(separator: ", ")
-        return [DeclSyntax(stringLiteral: """
-            \(shape.access)var values: LazyMapCollection<Index.AllCases, \(parameter)> {
-                Index.allCases.lazy.map(self.index)
-            }
-            """), DeclSyntax(stringLiteral: """
-            \(shape.access)typealias Index = \(structure.name.text)Index
-            """), DeclSyntax(stringLiteral: """
-            \(shape.access)func index(_ coordinate: Index) -> \(parameter) {
-                \(fields.isEmpty ? "" : "switch coordinate { \(arms) }")
-            }
-            """), DeclSyntax(stringLiteral: """
-            \(shape.access)static func tabulate(_ value: (Index) -> \(parameter)) -> Self {
-                Self(\(arguments))
-            }
-            """)]
+        return [
+            DeclSyntax(
+                stringLiteral: """
+                    \(shape.access)var values: LazyMapCollection<Index.AllCases, \(parameter)> {
+                        Index.allCases.lazy.map(self.index)
+                    }
+                    """
+            ),
+            DeclSyntax(
+                stringLiteral: """
+                    \(shape.access)typealias Index = \(structure.name.text)Index
+                    """
+            ),
+            DeclSyntax(
+                stringLiteral: """
+                    \(shape.access)func index(_ coordinate: Index) -> \(parameter) {
+                        \(fields.isEmpty ? "" : "switch coordinate { \(arms) }")
+                    }
+                    """
+            ),
+            DeclSyntax(
+                stringLiteral: """
+                    \(shape.access)static func tabulate(_ value: (Index) -> \(parameter)) -> Self {
+                        Self(\(arguments))
+                    }
+                    """
+            ),
+        ]
     }
     public static func index(of declaration: some DeclSyntaxProtocol) throws -> [DeclSyntax] {
         guard let structure = declaration.as(StructDeclSyntax.self) else { throw Type.Failure("@Representable requires a struct") }

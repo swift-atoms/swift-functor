@@ -1,7 +1,12 @@
-import Representable_Macro
 import Functor_Macro
+import Representable_Macro
 import Testing
-@Representable @Functor private struct Triple<A> { let first: A; let second: A; let third: A }
+
+@Representable @Functor private struct Triple<A> {
+    let first: A
+    let second: A
+    let third: A
+}
 @Representable private struct Empty<A> {}
 @Test func representableRoundTripsBothDirectionsWithOneIndexType() {
     let source = Triple(first: 2, second: 3, third: 5)

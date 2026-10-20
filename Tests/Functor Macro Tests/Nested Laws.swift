@@ -1,9 +1,16 @@
-import Functor_Macro
 import Algebra_Test_Support
+import Functor_Macro
 import Testing
-@Functor private struct Nested<A> { let values: [A?]; let metadata: Int }
+
+@Functor private struct Nested<A> {
+    let values: [A?]
+    let metadata: Int
+}
 extension Nested: Equatable where A: Equatable {}
-@Functor private enum Choice<A> { case empty; case values([A?]) }
+@Functor private enum Choice<A> {
+    case empty
+    case values([A?])
+}
 extension Choice: Equatable where A: Equatable {}
 @Functor private struct Reader<A> { let read: (Int) -> A }
 @Test func nestedFunctorIdentityAndComposition() {

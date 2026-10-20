@@ -1,22 +1,38 @@
-import Traversable_Macro
-import Functor_Macro
 import Foldable_Macro
+import Functor_Macro
 import Testing
+import Traversable_Macro
+
 @Functor @Foldable @Traversable
-private struct Batch<A> { let nested: [A?]; let tail: (A, A?); let label: String }
-@Traversable private enum Choice<A> { case empty; case values([A?]) }
+private struct Batch<A> {
+    let nested: [A?]
+    let tail: (A, A?)
+    let label: String
+}
+@Traversable private enum Choice<A> {
+    case empty
+    case values([A?])
+}
 private enum Failure: Error { case stop }
 @Test func optionalTraversalPreservesAbsenceAndStopsOnFailure() {
     let input = Batch(nested: [1, nil, 2], tail: (3, nil), label: "kept")
     var visits: [Int] = []
-    let result = input.traverseOptional { value -> String? in visits.append(value); return String(value) }
+    let result = input.traverseOptional { value -> String? in
+        visits.append(value)
+        return String(value)
+    }
     #expect(visits.elementsEqual([1, 2, 3]))
     #expect(result?.nested.elementsEqual(["1", nil, "2"]) == true)
     #expect(result?.tail.0 == "3")
     #expect(result?.tail.1 == nil)
     #expect(result?.label == "kept")
     visits = []
-    #expect(input.traverseOptional { value -> Int? in visits.append(value); return value == 2 ? nil : value } == nil)
+    #expect(
+        input.traverseOptional { value -> Int? in
+            visits.append(value)
+            return value == 2 ? nil : value
+        } == nil
+    )
     #expect(visits.elementsEqual([1, 2]))
     let empty: Choice<String>? = Choice<Int>.empty.traverseOptional(String.init)
     if case .some(.empty) = empty {} else { Issue.record("Empty shape must succeed without a visit") }
@@ -32,7 +48,8 @@ private enum Failure: Error { case stop }
     #expect(input.foldMap(sum, { $0 }) == 10)
     var visits: [Int] = []
     let failure = input.traverseResult { value -> Result<Int, Failure> in
-        visits.append(value); return value == 2 ? .failure(.stop) : .success(value)
+        visits.append(value)
+        return value == 2 ? .failure(.stop) : .success(value)
     }
     if case .failure(.stop) = failure {} else { Issue.record("Expected selected failure") }
     #expect(visits.elementsEqual([1, 2]))

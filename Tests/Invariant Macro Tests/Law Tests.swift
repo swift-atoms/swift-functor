@@ -1,6 +1,7 @@
-import Invariant_Macro
 import Algebra_Test_Support
+import Invariant_Macro
 import Testing
+
 @Invariant private struct Endomorphism<A> { let run: (A) -> A }
 @Test func invariantIdentityAndCompositionHoldObservationally() {
     let value = Endomorphism<Int>(run: { $0 * 2 })

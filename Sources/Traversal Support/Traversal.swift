@@ -3,7 +3,10 @@ public enum Traversal {}
 extension Traversal {
     public static func optional<A, B>(_ values: [A], _ transform: (A) -> B?) -> [B]? {
         var result: [B] = []
-        for value in values { guard let mapped = transform(value) else { return nil }; result.append(mapped) }
+        for value in values {
+            guard let mapped = transform(value) else { return nil }
+            result.append(mapped)
+        }
         return result
     }
     public static func optional<A, B>(_ value: A?, _ transform: (A) -> B?) -> B?? {
@@ -14,7 +17,10 @@ extension Traversal {
     public static func result<A, B, Failure: Error>(_ values: [A], _ transform: (A) -> Result<B, Failure>) -> Result<[B], Failure> {
         var result: [B] = []
         for value in values {
-            switch transform(value) { case .success(let mapped): result.append(mapped); case .failure(let error): return .failure(error) }
+            switch transform(value) {
+            case .success(let mapped): result.append(mapped)
+            case .failure(let error): return .failure(error)
+            }
         }
         return .success(result)
     }
