@@ -1,3 +1,5 @@
+import _Concurrency
+
 public enum Traversal {}
 
 extension Traversal {
