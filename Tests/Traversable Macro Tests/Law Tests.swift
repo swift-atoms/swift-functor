@@ -13,7 +13,7 @@ private struct Batch<A> {
     case empty
     case values([A?])
 }
-private enum Failure: Error { case stop }
+private enum Failure: Swift.Error { case stop }
 @Test func optionalTraversalPreservesAbsenceAndStopsOnFailure() {
     let input = Batch(nested: [1, nil, 2], tail: (3, nil), label: "kept")
     var visits: [Int] = []

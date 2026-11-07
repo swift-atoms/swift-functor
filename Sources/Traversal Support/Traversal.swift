@@ -16,7 +16,7 @@ extension Traversal {
         guard let mapped = transform(value) else { return nil }
         return .some(.some(mapped))
     }
-    public static func result<A, B, Failure: Error>(_ values: [A], _ transform: (A) -> Result<B, Failure>) -> Result<[B], Failure> {
+    public static func result<A, B, Failure: Swift.Error>(_ values: [A], _ transform: (A) -> Result<B, Failure>) -> Result<[B], Failure> {
         var result: [B] = []
         for value in values {
             switch transform(value) {
@@ -26,7 +26,7 @@ extension Traversal {
         }
         return .success(result)
     }
-    public static func result<A, B, Failure: Error>(_ value: A?, _ transform: (A) -> Result<B, Failure>) -> Result<B?, Failure> {
+    public static func result<A, B, Failure: Swift.Error>(_ value: A?, _ transform: (A) -> Result<B, Failure>) -> Result<B?, Failure> {
         guard let value else { return .success(nil) }
         return transform(value).map(Optional.some)
     }
